@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 | Box model part | Function                                                               |
 | -------------- | ---------------------------------------------------------------------- |
 | margin         | The outer space measured from the border to other elements on the page |
