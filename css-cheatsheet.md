@@ -1,3 +1,10 @@
+| Box model part | Function                                                               |
+| -------------- | ---------------------------------------------------------------------- |
+| margin         | The outer space measured from the border to other elements on the page |
+| border         | The border of the element                                              |
+| padding        | The inner space between the content and the border of the element      |
+| content        | The actual content box of the element                                  |
+
 | Property           | Effect                                         |
 | ------------------ | ---------------------------------------------- |
 | `color`            | Color of an elements text                      |
