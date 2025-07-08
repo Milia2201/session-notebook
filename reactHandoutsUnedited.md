@@ -526,11 +526,541 @@ function UserCard({ name, isFavorite }) {
   https://github.com/neuefische/allspice-cgn-fssd-25/blob/main/sessions/react-props/react-props.md?plain=1
   
     ------------------------------------------------------------------------------------------------------------------------------------------------
+# React Nesting
 
+## Learning Objectives
+
+- Understanding the concept of nesting
+- Creating multiple custom components to create a hierarchy
+- Using the `children` prop to render JSX from the parent component
+- Understanding composition as a way to build complex components
+
+---
+
+## Passing JSX as Props
+
+Elements created by JSX are just objects. They can be passed around like any other object: for example, as props.
+
+```js
+function UserCard({ avatar }) {
+  return <div className="card">{avatar}</div>;
+}
+```
+
+```js
+function App() {
+  return <UserCard avatar={<Avatar />} />;
+}
+```
+
+## The `children` Prop
+
+You are already familiar with nesting built-in browser tags:
+
+```js
+<div>
+  <img />
+</div>
+```
+
+Oftentimes you'd want your own components to be nestable as well.
+
+```js
+<UserCard>
+  <Avatar />
+</UserCard>
+```
+
+If you nest a component inside of another component, the nested component is passed as a prop to the parent component. This special prop is called `children`.
+
+```jsx
+function UserCard({ children }) {
+  return <div className="card">{children}</div>;
+}
+```
+
+This component will render the nested element(s) as a child of the `div` element.
+
+> 💡 The nested element(s) can be a single element, multiple elements, or even a string or number.
+
+> 📙 Read more about [**Passing JSX as children**
+> in the React Docs](https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children).
+
+## Fragments
+
+Sometimes you want to return multiple elements from a component function without wrapping them in a `div` or other element. You can use a `Fragment` (`<></>` or `<Fragment></Fragment>`) for this.
+
+This is necessary because React components can only return a single element from a component function.
+
+```jsx
+function UserList() {
+  return (
+    <>
+      <UserCard>
+        <Avatar />
+      </UserCard>
+      <UserCard>
+        <Avatar />
+      </UserCard>
+    </>
+  );
+}
+```
+
+This is equivalent to the following, but the shorthand version above is generally preferred.
+
+```jsx
+import { Fragment } from "react";
+
+function UserList() {
+  return (
+    <Fragment>
+      <UserCard>
+        <Avatar />
+      </UserCard>
+      <UserCard>
+        <Avatar />
+      </UserCard>
+    </Fragment>
+  );
+}
+```
+
+> 💡 The `<Fragment></Fragment>` syntax is only necessary if you want to pass the special `key` prop to the fragment, which will become important when you start working with lists.
+
+> 💡 When researching you sometimes might see `<React.Fragment></React.Fragment>`, which is the same thing.
+
+> 📙 Read more about [**Fragment (<>...</>)**
+> in the React Docs](https://react.dev/reference/react/Fragment).
+
+---
+
+## Composition
+
+When we build React applications, we often want to build complex components from simpler components. This is called composition.
+
+To do so you need to break down you application into components. You can then compose these components to build more complex components.
+
+It is important to figure out which components you need and how they should be composed. This is called application design.
+
+> 📙 Read [**Thinking in React**
+> in the React Docs](https://react.dev/learn/thinking-in-react) up to and including Step 2. Later steps require state, which we will cover in a future session.
+
+---
+
+## Resources
+
+- [Passing JSX as children in the React Docs](https://react.dev/learn/passing-props-to-a-component#passing-jsx-as-children)
+- [Fragment (<>...</>) in the React Docs](https://react.dev/reference/react/Fragment)
+- [Thinking in React in the React Docs](https://react.dev/learn/thinking-in-react)
+
+  Handout:
+  https://github.com/neuefische/allspice-cgn-fssd-25/blob/main/sessions/react-nesting/react-nesting.md?plain=1
+  
     ------------------------------------------------------------------------------------------------------------------------------------------------
+# React with Arrays
 
+## Learning Objectives
+
+- [ ] Knowing how to use `.map()` to render lists in JSX
+- [ ] Understanding how to render items from an array of objects
+- [ ] Knowing to add a unique key for list items
+
+---
+
+## Arrays in JSX
+
+To render elements from an array in React we use the array method `.map()`.
+
+The array method `.map()` is used to apply a transformation to all items of an array. When rendering
+an array to JSX we like to do exactly this. We like to transform each item of an array into a JSX
+tag. This is why we are using `.map()`.
+
+```js
+function Drinks() {
+  const drinks = ["water", "lemonade", "coffee", "tee"];
+
+  return (
+    <ul>
+      {drinks.map((drink) => (
+        <li>{drink}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+---
+
+## Key Property
+
+The example above misses a tiny, but very important part: the `key` prop!
+
+Without the `key` prop you will see an error in the console:
+
+> `Warning: Each child in a list should have a unique "key" prop.`
+
+When rendering an array in JSX you need to pass a **unique identifier** as value for the `key` prop
+of the first JSX tag returned in `.map()`. This is important for React to keep track of changes that
+happens to the data when re-rendering.
+
+Therefore you must always make sure your array contains a unique id per item. You can ensure this by
+using objects to define the data in your arrays.
+
+```js
+function Drinks() {
+  const drinks = [
+    { id: 0, name: "water" },
+    { id: 1, name: "lemonade" },
+    { id: 2, name: "coffee" },
+    { id: 3, name: "tea" },
+  ];
+
+  return (
+    <ul>
+      {drinks.map(({ id, name }) => (
+        <li key={id}>{name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+> 📙 If you are interested in understanding the details behind this, you can read about
+> [**the `key` prop** in the React Docs](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key).
+
+> 💡 If you pass the `key` prop to a component, you cannot access it in the component. It is a special prop that React only uses internally.
+>
+> ```js
+> function Drink({ name, key }) {
+>   console.log(key); // → undefined
+>   return <li>{name}</li>;
+> }
+>
+> function Drinks() {
+>   const drinks = [
+>     { id: 0, name: "water" },
+>     { id: 1, name: "lemonade" },
+>     { id: 2, name: "coffee" },
+>     { id: 3, name: "tea" },
+>   ];
+>
+>   return (
+>     <ul>
+>       {drinks.map(({ id, name }) => (
+>         <Drink key={id} name={name} />
+>       ))}
+>     </ul>
+>   );
+> }
+> ```
+>
+> If you want to access the `id` in this example you can pass it again as a prop:  
+> `<Drink key={id} id={id} name={name} />`.
+
+## Keyed Fragments
+
+If you are rendering a list of items that are not wrapped in a single JSX tag, you can use a
+`<Fragment>` to wrap the items.
+
+```js
+import { Fragment } from "react";
+
+function Drinks() {
+  const drinks = [
+    { id: 0, name: "water", description: "very wet" },
+    { id: 1, name: "lemonade", description: "quite sweet" },
+    { id: 2, name: "coffee", description: "cold brew" },
+    { id: 3, name: "tea", description: "earl grey, hot" },
+  ];
+
+  return (
+    <dl>
+      {drinks.map(({ id, name, description }) => (
+        <Fragment key={id}>
+          <dt>{name}</dt>
+          <dd>{description}</dd>
+        </Fragment>
+      ))}
+    </dl>
+  );
+}
+```
+
+> 💡 Here you cannot use the short syntax (`<>…</>`) for the `<Fragment>` because you need to
+> pass the `key` prop to the `<Fragment>`. The short syntax does not allow to pass props.
+
+---
+
+## Resources
+
+- [React Docs: Rendering Lists](https://react.dev/learn/rendering-lists)
+
+- Handout:
+  https://github.com/neuefische/allspice-cgn-fssd-25/blob/main/sessions/react-with-arrays/react-with-arrays.md?plain=1
     ------------------------------------------------------------------------------------------------------------------------------------------------
+# React State 2
 
+## Learning Objectives
+
+- [ ] Knowing how to handle form fields: controlled components, uncontrolled components
+- [ ] Knowing how to handle form submit events
+- [ ] Understanding the concept of lifting state up
+- [ ] Knowing how to pass state and functions via props
+- [ ] Understanding that state updates are not synchronous
+- [ ] Knowing what a `hook` in React is and which rules apply to hooks
+
+---
+
+## Sharing State Between Components
+
+### Passing State Down
+
+The value of a state variable and the setter function can be passed down to child components as
+props. They are functions and values, so they can be passed down like any other data.
+
+```js
+function Parent() {
+  const [count, setCount] = useState(0);
+
+  function handleIncrement() {
+    setCount(count + 1);
+  }
+
+  return <Child count={count} onIncrement={handleIncrement} />;
+}
+```
+
+```js
+function Child({ count, onIncrement }) {
+  return (
+    <>
+      <p>Count: {count}</p>
+      <button onClick={onIncrement}>increment</button>
+    </>
+  );
+}
+```
+
+### Lifting State Up
+
+When we have multiple components that need to share state, we can lift the state up to the parent
+component and pass it down as props. This is called "lifting state up" because you usually start with
+the state directly in the child component and then move it up to the parent components as you need
+it in more and more components.
+
+A state variable can be passed down to multiple child components. The child components can then
+update the state variable by calling the setter function.
+
+Any state variable should live as low in the component tree as possible but has high as needed. If
+the whole `App` needs to know about the state variable, it should live in the `App` component. If
+only child components of the `Article` need to know about the state variable, it should live in the
+`Article` component.
+
+Consider the following example:
+
+<img src="./assets/lifting-state-up.png" width="616" height="694" />
+
+Here we find that a `Link` in the `Navigation` component needs to know about a state that previously
+existed in the `Article` component. We can lift the state up to the `App` component and pass it down
+to the `Article` component as a prop.
+
+> 📙 Read more about
+> [**Sharing State Between Components** in the React docs](https://react.dev/learn/sharing-state-between-components).
+
+## Handling Form Data
+
+### Using Form Data `onSubmit`
+
+We can use the `onSubmit` event handler to handle form data. The `onSubmit` event handler is called
+when the user submits the form. We can get the form data (just like with regular JavaScript) from
+the `event` object.
+
+```js
+function SearchForm() {
+  function handleSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const searchTerm = form.elements.searchTerm.value;
+    console.log("A new search term was submitted:", searchTerm);
+  }
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="searchTerm">Search</label>
+      <input name="searchTerm" id="searchTerm" />
+      <button>Search</button>
+    </form>
+  );
+}
+```
+
+In this example the input elements value is not manually controlled by React: The input is an
+"uncontrolled input". It's value is managed by the browser. In the submit event handler we just
+"peek" at the input field and read the value from the DOM.
+
+### Using Controlled Inputs
+
+We can use React to control the value of an input element. This is called a "controlled input". This
+means that we manually set the value attribute of the input element. We can wire up a state variable
+to the value attribute of the input element. This way the input element will always have the same
+value as the state variable. Combined with the `onChange` event handler we can update the state
+variable when the user types in the input field.
+
+```js
+function SearchForm() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  function handleSubmit() {
+    event.preventDefault();
+    console.log("A new search term was submitted:", searchTerm);
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label htmlFor="searchTerm">Search</label>
+      <input
+        name="searchTerm"
+        id="searchTerm"
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target.value)}
+      />
+      <button>Search for {searchTerm}</button>
+    </form>
+  );
+}
+```
+
+In this example you always know the value of the search term input. Since it is a state variable,
+you can use it in other places in your application. You should prefer using uncontrolled inputs
+when possible, but sometimes you need to use a controlled input.
+
+You might need a controlled input when
+
+- showing search results while the user is typing,
+- autocompleting the user's input or
+- validating the user's input.
+
+## State Updates are not Immediate
+
+When we call the setter function of a state variable, React will not immediately update the state
+variable. Instead, it will update it's internal value and schedule a re-render of the component.
+
+```js
+// ⚠️ This code is broken!
+function Counter() {
+  const [count, setCount] = useState(0); // count is 0 initially
+
+  function handleIncrement() {
+    // when this is first called, count is still 0
+    console.log(count); // → 0
+
+    // this will set reacts internal state to 1,
+    // but does not update the count variable
+    setCount(count + 1);
+    console.log(count); // → 0
+
+    // the count variable is still 0, thus count + 1 is still 1,
+    // so react's internal state will still be 1
+    setCount(count + 1);
+    console.log(count); // → 0
+
+    // since setter functions were called
+    // react will schedule a re-render of
+    // the component with the new count value of 1
+  }
+
+  return (
+    <>
+      <p>Count: {count}</p>
+      <button onClick={handleIncrement}>increment by 2</button>
+    </>
+  );
+}
+```
+
+This behavior can be unexpected, but it is important to understand that state variables are not
+immediately updated.
+
+There are a few ways to fix the code above. In this example we could call `setCount(count + 2)` and
+be done. If for some reason we need to call `setCount` twice, we can use the functional form of the
+setter function, which provides the current internal value of the state variable as an argument.
+
+```js
+// ⚠️ This code is unnecessary complicated, but it works!
+function Counter() {
+  const [count, setCount] = useState(0); // count is 0 initially
+
+  function handleIncrement() {
+    // when this is first called, count is still 0
+    console.log(count); // → 0
+
+    // this will set reacts internal state to 1,
+    // but does not update the count variable
+    setCount((prevCount) => prevCount + 1);
+    console.log(count); // → 0
+
+    // the internal value of count is 1,
+    // we get it as the the first parameter of the function we pass to the setter.
+    // 1 + 1 is 2, so react's internal state will now be _2_
+    setCount((prevCount) => prevCount + 1);
+    console.log(count); // → 0
+
+    // since setter functions were called
+    // react will schedule a re-render of
+    // the component with the new count value of _2_
+  }
+
+  return (
+    <>
+      <p>Count: {count}</p>
+      <button onClick={handleIncrement}>increment by 2</button>
+    </>
+  );
+}
+```
+
+> 💡 Here the prefix `prev` is used to indicate that the value is the previous value of the state
+> variable. Another common convention is to use the just the first letter of the state variable as
+> the parameter name: `setCount(c => c + 1)`.
+
+> 📙 Read more about
+> [**Updating state based on the previous state**](https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state)
+> and
+> [**I’ve updated the state, but logging gives me the old value**](https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value)
+> in the React docs.
+
+## React Hooks
+
+The `useState` function is part of a broader set of features of react that give components extra
+powers.
+
+Hooks are functions that allow component functions to hook into React features (like state) and
+allow components to do more than a traditional JavaScript function can. They follow the naming
+convention `useXzy`.
+
+Common hooks that you'll come across are `useState` and `useEffect`.
+
+When using hooks you need to follow a few rules:
+
+- Only call hooks at the top level. Don’t call Hooks inside loops, conditions, or nested functions.
+- Only call hooks from React function components or custom hooks. Don’t call Hooks from regular
+  JavaScript functions.
+
+> 📙 Read more about [**Hooks** in the React Docs](https://reactjs.org/docs/hooks-overview.html)
+> from when they were introduced to React.
+
+---
+
+## Resources
+
+- [Sharing State Between Components in the React Docs](https://react.dev/learn/sharing-state-between-components)
+- [Updating state based on the previous state in the React Docs](https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state)
+- [I’ve updated the state, but logging gives me the old value in the React Docs](https://react.dev/reference/react/useState#ive-updated-the-state-but-logging-gives-me-the-old-value)
+- [Hooks at a Glance in the React Docs](https://reactjs.org/docs/hooks-overview.html)
+
+  Handout:
+  https://github.com/neuefische/allspice-cgn-fssd-25/blob/main/sessions/react-state-2/react-state-2.md?plain=1
+  
     ------------------------------------------------------------------------------------------------------------------------------------------------
 
     ------------------------------------------------------------------------------------------------------------------------------------------------
